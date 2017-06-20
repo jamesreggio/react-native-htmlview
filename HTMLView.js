@@ -72,24 +72,24 @@ class HtmlView extends Component {
   }
 
   render() {
-    if (this.state.element) {
-      return <View children={this.state.element} style={this.props.style} />;
-    }
-    return <View style={this.props.style} />;
+    const Root = this.props.rootElement;
+    return <Root children={this.state.element} style={this.props.style} />;
   }
 }
 
 HtmlView.propTypes = {
+  rootElement: PropTypes.object,
   addLineBreaks: PropTypes.bool,
   value: PropTypes.string,
   stylesheet: PropTypes.object,
-  style: ViewPropTypes.style,
+  style: PropTypes.object,
   onLinkPress: PropTypes.func,
   onError: PropTypes.func,
   renderNode: PropTypes.func,
 };
 
 HtmlView.defaultProps = {
+  rootElement: View,
   addLineBreaks: true,
   onLinkPress: url => Linking.openURL(url),
   onError: console.error.bind(console),
