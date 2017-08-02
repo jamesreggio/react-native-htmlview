@@ -5,6 +5,8 @@ import entities from 'entities';
 
 import AutoSizedImage from './AutoSizedImage';
 
+const whitespaceRegex = /\s+/g;
+
 const defaultOpts = {
   lineBreak: '\n',
   paragraphBreak: '\n\n',
@@ -55,6 +57,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
     const renderNode = opts.customRenderer;
     let orderedListCounter = 1;
 
+    let lastLinebreakAfter = null;
     return dom.map((node, index, list) => {
       if (renderNode) {
         const rendered = renderNode(
@@ -73,13 +76,18 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
 
+        let text = entities.decodeHTML(node.data).replace(whitespaceRegex, ' ');
+        if (text === ' ') {
+          return null;
+        }
+
         return (
           <TextComponent
             {...opts.textComponentProps}
             key={index}
             style={[defaultStyle, customStyle]}
           >
-            {entities.decodeHTML(node.data)}
+            {text}
           </TextComponent>
         );
       }
@@ -105,7 +113,9 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         if (opts.addLineBreaks) {
           switch (node.name) {
           case 'pre':
-            linebreakBefore = opts.lineBreak;
+            if (lastLinebreakAfter !== ' ') {
+              linebreakBefore = opts.lineBreak;
+            }
             break;
           case 'p':
             if (index < list.length - 1) {
@@ -113,6 +123,12 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             }
             break;
           case 'br':
+            if (lastLinebreakAfter !== ' ') {
+              linebreakAfter = opts.lineBreak;
+            }
+            break;
+          case 'ul':
+          case 'ol':
           case 'h1':
           case 'h2':
           case 'h3':
@@ -122,6 +138,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             break;
           }
         }
+        lastLinebreakAfter = linebreakAfter;
 
         let listItemPrefix = null;
         if (node.name === 'li') {
