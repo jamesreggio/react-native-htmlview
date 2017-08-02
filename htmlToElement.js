@@ -5,6 +5,8 @@ import entities from 'entities';
 
 import AutoSizedImage from './AutoSizedImage';
 
+const whitespaceRegex = /\s+/g;
+
 const defaultOpts = {
   lineBreak: '\n',
   paragraphBreak: '\n\n',
@@ -79,7 +81,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             key={index}
             style={[defaultStyle, customStyle]}
           >
-            {entities.decodeHTML(node.data)}
+            {entities.decodeHTML(node.data).replace(whitespaceRegex, ' ').trim()}
           </TextComponent>
         );
       }
