@@ -57,6 +57,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
     const renderNode = opts.customRenderer;
     let orderedListCounter = 1;
 
+    let lastLinebreakAfter = null;
     return dom.map((node, index, list) => {
       if (renderNode) {
         const rendered = renderNode(
@@ -76,7 +77,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const customStyle = inheritedStyle(parent);
 
         let text = entities.decodeHTML(node.data).replace(whitespaceRegex, ' ');
-        if (parent.name === 'p') {
+        if (!parent || parent.name === 'p') {
           text = text.trim();
         }
 
@@ -112,7 +113,9 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         if (opts.addLineBreaks) {
           switch (node.name) {
           case 'pre':
-            linebreakBefore = opts.lineBreak;
+            if (lastLinebreakAfter !== ' ') {
+              linebreakBefore = opts.lineBreak;
+            }
             break;
           case 'p':
             if (index < list.length - 1) {
@@ -120,6 +123,10 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             }
             break;
           case 'br':
+            if (lastLinebreakAfter !== ' ') {
+              linebreakAfter = opts.lineBreak;
+            }
+            break;
           case 'h1':
           case 'h2':
           case 'h3':
@@ -129,6 +136,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             break;
           }
         }
+        lastLinebreakAfter = linebreakAfter;
 
         let listItemPrefix = null;
         if (node.name === 'li') {
