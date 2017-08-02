@@ -77,7 +77,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const customStyle = inheritedStyle(parent);
 
         let text = entities.decodeHTML(node.data).replace(whitespaceRegex, ' ');
-        if (!parent || parent.name === 'p') {
+        if (!parent) {
           text = text.trim();
         }
 
@@ -117,6 +117,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               linebreakBefore = opts.lineBreak;
             }
             break;
+          case 'ul':
+          case 'ol':
           case 'p':
             if (index < list.length - 1) {
               linebreakAfter = opts.paragraphBreak;
