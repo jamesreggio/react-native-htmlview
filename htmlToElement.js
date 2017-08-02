@@ -77,8 +77,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const customStyle = inheritedStyle(parent);
 
         let text = entities.decodeHTML(node.data).replace(whitespaceRegex, ' ');
-        if (!parent) {
-          text = text.trim();
+        if (text === ' ') {
+          return null;
         }
 
         return (
@@ -117,8 +117,6 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               linebreakBefore = opts.lineBreak;
             }
             break;
-          case 'ul':
-          case 'ol':
           case 'p':
             if (index < list.length - 1) {
               linebreakAfter = opts.paragraphBreak;
@@ -129,6 +127,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               linebreakAfter = opts.lineBreak;
             }
             break;
+          case 'ul':
+          case 'ol':
           case 'h1':
           case 'h2':
           case 'h3':
