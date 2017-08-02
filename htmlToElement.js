@@ -75,13 +75,18 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
 
+        let text = entities.decodeHTML(node.data).replace(whitespaceRegex, ' ');
+        if (parent.name === 'p') {
+          text = text.trim();
+        }
+
         return (
           <TextComponent
             {...opts.textComponentProps}
             key={index}
             style={[defaultStyle, customStyle]}
           >
-            {entities.decodeHTML(node.data).replace(whitespaceRegex, ' ').trim()}
+            {text}
           </TextComponent>
         );
       }
