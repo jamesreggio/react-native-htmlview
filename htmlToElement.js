@@ -5,16 +5,6 @@ import entities from 'entities';
 
 import AutoSizedImage from './AutoSizedImage';
 
-const defaultOpts = {
-  lineBreak: '\n',
-  paragraphBreak: '\n\n',
-  bullet: '\u2022 ',
-  TextComponent: Text,
-  textComponentProps: null,
-  NodeComponent: Text,
-  nodeComponentProps: null,
-};
-
 const Img = props => {
   const width =
     parseInt(props.attribs['width'], 10) || parseInt(props.attribs['data-width'], 10) || 0;
@@ -34,6 +24,20 @@ const Img = props => {
     height,
   };
   return <AutoSizedImage source={source} style={imgStyle} />;
+};
+
+const defaultOpts = {
+  addLineBreaks: false,
+  includeImages: true,
+  lineBreak: '\n',
+  paragraphBreak: '\n\n',
+  bullet: '\u2022 ',
+  TextComponent: Text,
+  textComponentProps: null,
+  NodeComponent: Text,
+  nodeComponentProps: null,
+  ImageComponent: Img,
+  ImageComponentProps: null,
 };
 
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
@@ -67,7 +71,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         if (rendered || rendered === null) return rendered;
       }
 
-      const {TextComponent} = opts;
+      const {TextComponent, ImageComponent} = opts;
 
       if (node.type === 'text') {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
@@ -86,7 +90,11 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
 
       if (node.type === 'tag') {
         if (node.name === 'img') {
-          return <Img key={index} attribs={node.attribs} />;
+          if (opts.includeImages && ImageComponent) {
+            return <ImageComponent {...opts.imageComponentProps} key={index} attribs={node.attribs} />;
+          } else {
+            return null;
+          }
         }
 
         let linkPressHandler = null;
