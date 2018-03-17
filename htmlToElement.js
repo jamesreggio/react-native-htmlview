@@ -5,7 +5,7 @@ import entities from 'entities';
 
 import AutoSizedImage from './AutoSizedImage';
 
-const whitespaceRegex = /\s+/g;
+const whitespaceRegex = /[\r\t\f\v ]+/g;
 
 const Img = props => {
   const width =
